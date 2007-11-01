@@ -1333,7 +1333,7 @@ sub _ProcessObjectCustomFieldUpdates {
                 }
                 # build up a hash of values that the new set has
                 $values_hash{"$category-$value"} = 1;
-                next if $cf_values->HasEntry( $value );
+                next if $cf_values->HasEntry( Value => $value, Category => $category );
 
                 my ( $val, $msg ) = $args{'Object'}->AddCustomFieldValue(
                     Field => $cf,
