@@ -92,7 +92,7 @@ sub Create {
         $self->SetCategory($args{'Category'});
     }
 
-    return ($id, $msg);
+    return (wantarray ? ($id, $msg) : $id);
 
 }
 
