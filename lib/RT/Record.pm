@@ -1587,6 +1587,14 @@ deletes the old value.
 If VALUE is not a valid value for the custom field, returns 
 (0, 'Error message' ) otherwise, returns (1, 'Success Message')
 
+Optional Arguments
+
+ RecordTransaction => 0
+Don't record a transaction for adding this Custom Field Value
+
+ Category => 'Foo'
+For select CFs, note that this value came from a particular category
+
 =cut
 
 sub AddCustomFieldValue {
