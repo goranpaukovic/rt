@@ -1325,12 +1325,10 @@ sub _ProcessObjectCustomFieldUpdates {
             my %values_hash;
             foreach my $value ( @values ) {
                 my $category;
-                $RT::Logger->error("value [$value]");
                 if ($value =~ /Category>>\|<<(.*?)>>\|<<(.*)/) {
                     $category = $1;
                     $value = $2;
                 }
-                $RT::Logger->error("category [$category] value [$value]");
                 # build up a hash of values that the new set has
                 $values_hash{"$category-$value"} = 1;
                 next if $cf_values->HasEntry( $value );
@@ -1345,7 +1343,6 @@ sub _ProcessObjectCustomFieldUpdates {
 
             $cf_values->RedoSearch;
             while ( my $cf_value = $cf_values->Next ) {
-                $RT::Logger->error("value hash lookup ". ($cf_value->Category||'') . '-' . $cf_value->Content);
                 next if $values_hash{ ($cf_value->Category||'') . '-' . $cf_value->Content };
 
                 my ( $val, $msg ) = $args{'Object'}->DeleteCustomFieldValue(
