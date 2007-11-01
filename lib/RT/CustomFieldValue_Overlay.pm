@@ -92,6 +92,24 @@ sub SetCategory {
     $self->SetAttribute(Name => 'Category', Content => $category);
 }
 
+sub DeleteCategory {
+    my $self = shift;
+    my $attr = $self->FirstAttribute('Category') or return (-1,'No Category Set');
+    return $attr->Delete;
+}
+
+sub Delete {
+    my $self = shift;
+
+    my ($result, $msg) = $self->DeleteCategory;
+
+    unless ($result) {
+        return ($result, $msg);
+    }
+
+    return $self->SUPER::Delete(@_);
+}
+
 sub ValidateName { 1 };
 
 1;
