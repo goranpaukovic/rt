@@ -106,7 +106,9 @@ $Rows => undef
 %             push @levels, $level;
 %         }
 %     }
-        <option value="<%$value->Name%>" 
+%     # use <<>> as a bizarre joiner and we'll disallow it in category names
+%     my $optionname = join(">>|<<",("Category", $category, $value->Name));
+        <option value="<%$optionname%>" 
 % if ($Values) {
             <% ($Values->HasEntry($value->Name)||'') && ($$SelectedRef = 1) && 'SELECTED' %>
 % } elsif ($Default) {

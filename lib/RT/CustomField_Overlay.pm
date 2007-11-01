@@ -1002,6 +1002,7 @@ Optional:
 
     LargeContent
     ContentType
+    Category
 
 =cut
 
@@ -1012,6 +1013,7 @@ sub AddValueForObject {
         Content      => undef,
         LargeContent => undef,
         ContentType  => undef,
+        Category     => undef,
         @_
     );
     my $obj = $args{'Object'} or return;
@@ -1059,7 +1061,8 @@ sub AddValueForObject {
         Content      => $args{'Content'},
         LargeContent => $args{'LargeContent'},
         ContentType  => $args{'ContentType'},
-        CustomField  => $self->Id
+        CustomField  => $self->Id,
+        Category     => $args{'Category'}
     );
 
     unless ($val) {

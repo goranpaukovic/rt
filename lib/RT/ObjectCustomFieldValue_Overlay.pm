@@ -62,6 +62,7 @@ sub Create {
                 LargeContent => '',
                 ContentType => '',
                 ContentEncoding => '',
+                Category => '',
 
           @_);
 
@@ -77,7 +78,7 @@ sub Create {
       $self->_EncodeLOB( $args{'LargeContent'}, $args{'ContentType'} )
       if ( $args{'LargeContent'} );
 
-    $self->SUPER::Create(
+    my ($id, $msg) = $self->SUPER::Create(
                          CustomField => $args{'CustomField'},
                          ObjectType => $args{'ObjectType'},
                          ObjectId => $args{'ObjectId'},
@@ -85,10 +86,13 @@ sub Create {
                          Content => $args{'Content'},
                          LargeContent => $args{'LargeContent'},
                          ContentType => $args{'ContentType'},
-                         ContentEncoding => $args{'ContentEncoding'},
-);
+                         ContentEncoding => $args{'ContentEncoding'});
 
+    if ($id) {
+        $self->SetCategory($args{'Category'});
+    }
 
+    return ($id, $msg);
 
 }
 
@@ -256,7 +260,61 @@ sub IncludeContentForValue {
     return $self->_FillInTemplateURL($self->CustomFieldObj->IncludeContentForValue);
 }
 
+=head2 Category
+
+Returns the Category Attribute for this Value
+If there is no Category, returns undef
+
+=cut
+
+sub Category {
+    my $self = shift;
+    my $attr = $self->FirstAttribute('Category') or return undef;
+    return $attr->Content;
+}
 
 
+=head2 SetCategory Category
+
+Sets the Category Attribute for this Value.
+Assumes there is only one Category per Value
+
+=cut
+
+sub SetCategory {
+    my $self = shift;
+    my $category = shift;
+    $self->SetAttribute(Name => 'Category', Content => $category);
+}
+
+=head2 DeleteCategory
+
+Removes the Category Attribute from this Value
+
+=cut
+
+sub DeleteCategory {
+    my $self = shift;
+    my $attr = $self->FirstAttribute('Category') or return (-1,'No Category Set');
+    return $attr->Delete;
+}
+
+=head2 Delete
+
+Make sure that the Category Attribute is deleted when we're deleted
+
+=cut
+
+sub Delete {
+    my $self = shift;
+
+    my ($result, $msg) = $self->DeleteCategory;
+
+    unless ($result) {
+        return ($result, $msg);
+    }
+
+    return $self->SUPER::Delete(@_);
+}
 
 1;

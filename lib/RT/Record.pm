@@ -1600,6 +1600,7 @@ sub _AddCustomFieldValue {
         Field             => undef,
         Value             => undef,
         RecordTransaction => 1,
+        Category          => undef,
         @_
     );
 
@@ -1671,6 +1672,7 @@ sub _AddCustomFieldValue {
             Content      => $args{'Value'},
             LargeContent => $args{'LargeContent'},
             ContentType  => $args{'ContentType'},
+            Category     => $args{'Category'}
         );
 
         unless ($new_value_id) {
