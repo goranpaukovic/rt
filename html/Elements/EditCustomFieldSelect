@@ -50,8 +50,10 @@
 %# (perhaps by tweaking the .display style?)
 %       my $selected = 0;
 %       my @category;
+%       my $default_category;
 %       my $id = $NamePrefix . $CustomField->Id;
-%       my $out = $m->scomp('SELF:options', %ARGS, SelectedRef => \$selected, CategoryRef => \@category);
+%       my $out = $m->scomp('SELF:options', %ARGS, SelectedRef => \$selected, 
+%                           CategoryRef => \@category, DefaultCategoryRef => \$default_category);
 %       if (@category) {
 <script type="text/javascript" src="<%$RT::WebPath%>/NoAuth/js/cascaded.js"></script>
 %#      XXX - Hide this select from w3m?
@@ -59,7 +61,11 @@
         <option value="" <% !$selected && 'SELECTED' %>><&|/l&>-</&></option>
 %           foreach my $cat (@category) {
 %               my ($depth, $name) = @$cat;
-        <option value="<% $name %>"><% '&nbsp;' x $depth |n %><%$name%></option>
+        <option value="<% $name %>"
+%       if ($name eq $default_category) {
+            SELECTED
+%       }
+        ><% '&nbsp;' x $depth |n %><%$name%></option>
 %           }
       </select><br />
 %       }
@@ -82,7 +88,6 @@ $Rows => undef
 </%ARGS>
 
 <%method options>
-% my $selected;
 % my $CFVs = $CustomField->Values;
 % my @levels;
 % while ($CFVs and my $value = $CFVs->Next ) {
@@ -110,11 +115,17 @@ $Rows => undef
 %     my $optionname = join(">>|<<",("Category", $category, $value->Name));
         <option value="<%$optionname%>" 
 % if ($Values) {
-            <% ($Values->HasEntry(Value => $value->Name, Category => ($value->Category||'')) ||'') 
-                && ($$SelectedRef = 1) && 'SELECTED' %>
+%   if ( $Values->HasEntry(Value => $value->Name, Category => ($value->Category||'')) ) {
+%        $$SelectedRef = 1;
+%        $$DefaultCategoryRef = $value->Category;
+         SELECTED
+%   }
 % } elsif ($Default) {
-            <% (ref $Default ? (grep {$_ eq $value->Name} @{$Default}) : ($Default eq $value->Name))
-                && ($$SelectedRef = 1) && 'SELECTED' %>
+%   if (ref $Default ? (grep {$_ eq $value->Name} @{$Default}) : ($Default eq $value->Name)) {
+%        $$SelectedRef = 1; 
+%        $$DefaultCategoryRef = $value->Category;
+         SELECTED
+%   }
 % }
             ><% $value->Name%></option>
 % }
@@ -127,5 +138,6 @@ $Default => undef
 $Values => undef
 $SelectedRef => undef
 $CategoryRef => undef
+$DefaultCategoryRef => undef
 </%args>
 </%method>
