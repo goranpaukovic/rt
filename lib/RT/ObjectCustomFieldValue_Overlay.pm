@@ -299,22 +299,4 @@ sub DeleteCategory {
     return $attr->Delete;
 }
 
-=head2 Delete
-
-Make sure that the Category Attribute is deleted when we're deleted
-
-=cut
-
-sub Delete {
-    my $self = shift;
-
-    my ($result, $msg) = $self->DeleteCategory;
-
-    unless ($result) {
-        return ($result, $msg);
-    }
-
-    return $self->SUPER::Delete(@_);
-}
-
 1;
