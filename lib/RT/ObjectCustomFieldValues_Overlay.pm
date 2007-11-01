@@ -117,11 +117,26 @@ Returns true if this CustomFieldValues collection has an entry with content that
 
 sub HasEntry {
     my $self = shift;
-    my $value = shift;
+    my $value;
+    my $category;
+    if (@_ == 1) {
+        $value = shift;
+    } elsif (@_ > 1) {
+        my %args = @_;
+        $value    = $args{Value};
+        $category = $args{Category};
+    } else {
+        $RT::Logger->warning("Invalid argument list passed to RT::ObjectCustomFieldValues::HasEntry [@_]");
+        return undef;
+    }
 
     #TODO: this could cache and optimize a fair bit.
     foreach my $item (@{$self->ItemsArrayRef}) {
-        return(1) if ($item->Content eq $value);  
+        if ($item->Content eq $value) {
+            # not all selects use categories
+            next if ($category && $item->Category ne $category);
+            return(1) 
+        }
     }
     return undef;
 

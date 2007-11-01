@@ -106,11 +106,12 @@ $Rows => undef
 %             push @levels, $level;
 %         }
 %     }
-%     # use <<>> as a bizarre joiner and we'll disallow it in category names
+%     # use >>|<< as a bizarre joiner and we'll disallow it in category names
 %     my $optionname = join(">>|<<",("Category", $category, $value->Name));
         <option value="<%$optionname%>" 
 % if ($Values) {
-            <% ($Values->HasEntry($value->Name)||'') && ($$SelectedRef = 1) && 'SELECTED' %>
+            <% ($Values->HasEntry(Value => $value->Name, Category => ($value->Category||'')) ||'') 
+                && ($$SelectedRef = 1) && 'SELECTED' %>
 % } elsif ($Default) {
             <% (ref $Default ? (grep {$_ eq $value->Name} @{$Default}) : ($Default eq $value->Name))
                 && ($$SelectedRef = 1) && 'SELECTED' %>

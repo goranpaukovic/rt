@@ -1325,6 +1325,8 @@ sub _ProcessObjectCustomFieldUpdates {
             my %values_hash;
             foreach my $value ( @values ) {
                 my $category;
+                # trying to encode values in a string led to the ugly
+                # >>|<< seperator
                 if ($value =~ /Category>>\|<<(.*?)>>\|<<(.*)/) {
                     $category = $1;
                     $value = $2;
