@@ -726,13 +726,22 @@ sub Create {
         {
             next unless ( length($value) );
 
+            my $category;
+            if ( $value =~ /Category>>\|<<(.*?)>>\|<<(.*)/ ) {
+
+                $category = $1;
+                $value    = $2;
+            }
+
             # Allow passing in uploaded LargeContent etc by hash reference
             $self->_AddCustomFieldValue(
-                (UNIVERSAL::isa( $value => 'HASH' )
+                (
+                    UNIVERSAL::isa( $value => 'HASH' )
                     ? %$value
-                    : (Value => $value)
+                    : ( Value => $value )
                 ),
                 Field             => $cfid,
+                Category          => $category,
                 RecordTransaction => 0,
             );
         }
