@@ -200,6 +200,7 @@ Module::Versions::Report 1.03
 Cache::Simple::TimedExpiry
 UNIVERSAL::require
 Calendar::Simple
+CSS::Squish 0.06
 .
 
 $deps{'MASON'} = [ text_to_hash( << '.') ];
@@ -214,6 +215,7 @@ GD
 GD::Graph
 GD::Text
 Text::WikiFormat 0.76
+CSS::Squish 0.06
 .
 
 $deps{'STANDALONE'} = [ text_to_hash( << '.') ];
