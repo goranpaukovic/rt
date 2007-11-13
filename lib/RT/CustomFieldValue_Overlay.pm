@@ -80,11 +80,24 @@ sub Create {
     return ($id, $msg);
 }
 
+=head2 Category
+
+Returns the Category assigned to this Value
+Returns udef if there is no Category
+
+=cut
+
 sub Category {
     my $self = shift;
     my $attr = $self->FirstAttribute('Category') or return undef;
     return $attr->Content;
 }
+
+=head2 SetCategory Category
+
+Takes a string Category and stores it as an attribute of this CustomFieldValue
+
+=cut
 
 sub SetCategory {
     my $self = shift;
@@ -92,11 +105,24 @@ sub SetCategory {
     $self->SetAttribute(Name => 'Category', Content => $category);
 }
 
+=head2 DeleteCategory
+
+Deletes the category associated with this value
+Returns -1 if there is no Category
+
+=cut
+
 sub DeleteCategory {
     my $self = shift;
     my $attr = $self->FirstAttribute('Category') or return (-1,'No Category Set');
     return $attr->Delete;
 }
+
+=head2 Delete
+
+Make sure we delete our Category when we're deleted
+
+=cut
 
 sub Delete {
     my $self = shift;
