@@ -50,7 +50,7 @@
 %# (perhaps by tweaking the .display style?)
 %       my $selected = 0;
 %       my @category;
-%       my $default_category;
+%       my $default_category = '';
 %       my $id = $NamePrefix . $CustomField->Id;
 %       my $out = $m->scomp('SELF:options', %ARGS, SelectedRef => \$selected, 
 %                           CategoryRef => \@category, DefaultCategoryRef => \$default_category);
