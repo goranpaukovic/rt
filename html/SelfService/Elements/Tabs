@@ -104,6 +104,11 @@ my $actions = {
 	B => { html => $m->scomp('GotoTicket') 
 		}
 	};
+
+  $m->comp('/Elements/Callback', 
+    actions => $actions, 
+    tabs => $tabs, %ARGS);
+
 </%INIT>
 <%ARGS>
 $Title => undef
