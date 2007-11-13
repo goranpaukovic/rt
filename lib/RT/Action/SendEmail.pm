@@ -164,16 +164,24 @@ sub Prepare {
     # We should never have to set the MIME-Version header
     $self->SetHeader( 'MIME-Version', '1.0' );
 
-    # try to convert message body from utf-8 to $RT::EmailOutputEncoding
-    $self->SetHeader( 'Content-Type', 'text/plain; charset="utf-8"' );
-
     # fsck.com #5959: Since RT sends 8bit mail, we should say so.
     $self->SetHeader( 'Content-Transfer-Encoding','8bit');
 
+    # For security reasons, we only send out textual mails.
+    my @parts = $MIMEObj;
+    while (my $part = shift @parts) {
+        if ($part->is_multipart) {
+            push @parts, $part->parts;
+        }
+        else {
+            $part->head->mime_attr( "Content-Type" => 'text/plain' )
+                unless RT::I18N::IsTextualContentType($part->mime_type);
+            $part->head->mime_attr( "Content-Type.charset" => 'utf-8' );
+        }
+    }
 
-    RT::I18N::SetMIMEEntityToEncoding( $MIMEObj, $RT::EmailOutputEncoding,
-        'mime_words_ok' );
-    $self->SetHeader( 'Content-Type', 'text/plain; charset="' . $RT::EmailOutputEncoding . '"' );
+
+    RT::I18N::SetMIMEEntityToEncoding( $MIMEObj, $RT::EmailOutputEncoding, 'mime_words_ok' );
 
     # Build up a MIME::Entity that looks like the original message.
     $self->AddAttachments() if ( $MIMEObj->head->get('RT-Attach-Message') );
@@ -398,7 +406,7 @@ sub AddAttachments {
         # Don't attach anything blank
         next unless ( $attach->ContentLength );
 
-# We want to make sure that we don't include the attachment that's being sued as the "Content" of this message"
+# We want to make sure that we don't include the attachment that's being used as the "Content" of this message.
         next
           if ( $transaction_content_obj
             && $transaction_content_obj->Id == $attach->Id
