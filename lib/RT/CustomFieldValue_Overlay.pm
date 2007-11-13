@@ -112,4 +112,20 @@ sub Delete {
 
 sub ValidateName { 1 };
 
+=head2 EncodedName
+
+Returns a CustomFieldValue Name suitable for use in drop down lists
+It encodes the Category name along with the Value name in a way that
+can be extracted later so we can store Category.
+
+=cut
+
+sub EncodedName {
+    my $self = shift;
+
+    # use >>|<< as a bizarre joiner and we'll disallow it in category names
+    return join(">>|<<",("Category", ($self->Category||''), $self->Name));
+
+}
+
 1;
