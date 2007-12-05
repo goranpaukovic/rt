@@ -217,7 +217,6 @@ while (my $value = $values->Next) {
 	if ( $ARGS{$param} && ($value->$attr() ne $ARGS{$param}))  {
 		my $mutator = "Set$attr";
 		my ($id, $msg) = $value->$mutator($ARGS{$param});
-        $RT::Logger->error("[$param] [$mutator] [$id] [$msg]");
         push (@results, $msg);
 		}
     }
@@ -232,7 +231,6 @@ while (my $value = $values->Next) {
                 $mutator = "DeleteCategory";
             }
             my ($id, $msg) = $value->$mutator($ARGS{$param});
-            $RT::Logger->error("[$param] [$mutator] [$id] [$msg]");
             push (@results, $msg);
         }
     }
