@@ -727,6 +727,7 @@ sub Create {
             next unless ( length($value) );
 
             my $category;
+            # all other objects hide this in RT::Interface::Web::ProcessObjectCustomFieldUpdates
             if ( $value =~ /Category>>\|<<(.*?)>>\|<<(.*)/ ) {
 
                 $category = $1;
