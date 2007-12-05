@@ -217,10 +217,25 @@ while (my $value = $values->Next) {
 	if ( $ARGS{$param} && ($value->$attr() ne $ARGS{$param}))  {
 		my $mutator = "Set$attr";
 		my ($id, $msg) = $value->$mutator($ARGS{$param});
+        $RT::Logger->error("[$param] [$mutator] [$id] [$msg]");
         push (@results, $msg);
 		}
-	}
+    }
 
+    # these three things can be safely set to ''
+    # you shouldn't be doing that to Name
+	foreach my $attr qw(Description SortOrder Category) {
+        my $param = $paramtag.$value->Id."-".$attr;
+        if ( !$ARGS{$param} && $value->$attr ) {
+            my $mutator = "Set$attr";
+            if ($attr eq 'Category') { # we actually want the Attribute to go away
+                $mutator = "DeleteCategory";
+            }
+            my ($id, $msg) = $value->$mutator($ARGS{$param});
+            $RT::Logger->error("[$param] [$mutator] [$id] [$msg]");
+            push (@results, $msg);
+        }
+    }
 
 }
 
