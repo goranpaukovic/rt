@@ -225,7 +225,7 @@ while (my $value = $values->Next) {
     # you shouldn't be doing that to Name
 	foreach my $attr qw(Description SortOrder Category) {
         my $param = $paramtag.$value->Id."-".$attr;
-        if ( !$ARGS{$param} && $value->$attr ) {
+        if ( exists $ARGS{$param} && !$ARGS{$param} && $value->$attr ) {
             my $mutator = "Set$attr";
             if ($attr eq 'Category') { # we actually want the Attribute to go away
                 $mutator = "DeleteCategory";
