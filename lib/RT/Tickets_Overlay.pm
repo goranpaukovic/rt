@@ -2759,21 +2759,9 @@ sub FilterRecord {
 
 sub Next {
     my $self = shift;
-
-    $self->_ProcessRestrictions() if ( $self->{'RecalcTicketLimits'} == 1 );
-
-    my $Ticket = $self->SUPER::Next();
-    # if there never was any ticket
-    return $Ticket unless $Ticket;
-    # filtered out
-    return $self->Next if $self->FilterRecord( $Ticket );
-    # fine
-    return $Ticket;
+    $self->_ProcessRestrictions if $self->{'RecalcTicketLimits'}
+    return $self->SUPER::Next( @_ );
 }
-
-
-
-
 
 # }}}
 
@@ -3081,7 +3069,7 @@ You don't want to serialize a big tickets object, as the {items} hash will be in
 sub PrepForSerialization {
     my $self = shift;
     delete $self->{'items'};
-    $self->RedoSearch();
+    $self->RedoSearch;
 }
 
 =head1 FLAGS
