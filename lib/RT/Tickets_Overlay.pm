@@ -2756,41 +2756,24 @@ sub FilterRecord {
 }
 
 # {{{ sub Next
+
 sub Next {
     my $self = shift;
 
     $self->_ProcessRestrictions() if ( $self->{'RecalcTicketLimits'} == 1 );
 
     my $Ticket = $self->SUPER::Next();
-    if ( ( defined($Ticket) ) and ( ref($Ticket) ) ) {
-
-        if ( $Ticket->__Value('Status') eq 'deleted'
-            && !$self->{'allow_deleted_search'} )
-        {
-            return ( $self->Next() );
-        }
-
-        # Since Ticket could be granted with more rights instead
-        # of being revoked, it's ok if queue rights allow
-        # ShowTicket.  It seems need another query, but we have
-        # rights cache in Principal::HasRight.
-        elsif ( $Ticket->CurrentUserHasRight('ShowTicket') )
-        {
-            return ($Ticket);
-        }
-
-        #If the user doesn't have the right to show this ticket
-        else {
-            return ( $self->Next() );
-        }
-    }
-
-    #if there never was any ticket
-    else {
-        return (undef);
-    }
-
+    # if there never was any ticket
+    return $Ticket unless $Ticket;
+    # filtered out
+    return $self->Next if $self->FilterRecord( $Ticket );
+    # fine
+    return $Ticket;
 }
+
+
+
+
 
 # }}}
 
