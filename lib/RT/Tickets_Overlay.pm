@@ -2693,23 +2693,49 @@ sub _Init {
 
 # }}}
 
-# {{{ sub Count
 sub Count {
     my $self = shift;
-    $self->_ProcessRestrictions() if ( $self->{'RecalcTicketLimits'} == 1 );
-    return ( $self->SUPER::Count() );
+
+    $self->_ProcessRestrictions if $self->{'RecalcTicketLimits'};
+    return undef unless $self->_isLimited;
+
+    return $self->_OurDoCount;
 }
 
-# }}}
+sub CountAll { return (shift)->Count( @_ ) }
 
-# {{{ sub CountAll
-sub CountAll {
+
+my $COUNT_SAMPLE_SIZE = 5;
+
+sub _OurDoCount {
     my $self = shift;
-    $self->_ProcessRestrictions() if ( $self->{'RecalcTicketLimits'} == 1 );
-    return ( $self->SUPER::CountAll() );
-}
 
-# }}}
+    my $query_string = do {
+        local $self->{'first_row'} = 0;
+        local $self->{'show_rows'} = $COUNT_SAMPLE_SIZE;
+        $self->BuildSelectQuery;
+    };
+
+    my $records = $self->_Handle->SimpleQuery( $query_string );
+    return undef unless $records;
+
+    my ($total_found, $filtered_found) = (0, 0);
+    while ( my $row = $records->fetchrow_hashref ) {
+        $total_found++;
+
+        my $item = $self->NewItem;
+        $item->LoadFromHash( $row );
+        next if $self->FilterRecord( $item );
+
+        $filtered_found++
+    }
+    $RT::Logger->error("SQL error: ". $records->err) if $records->err;
+
+    return -1 - $filtered_found
+        if $total_found == $COUNT_SAMPLE_SIZE;
+
+    return $filtered_found;
+}
 
 # {{{ sub ItemsArrayRef
 
@@ -2759,7 +2785,7 @@ sub FilterRecord {
 
 sub Next {
     my $self = shift;
-    $self->_ProcessRestrictions if $self->{'RecalcTicketLimits'}
+    $self->_ProcessRestrictions if $self->{'RecalcTicketLimits'};
     return $self->SUPER::Next( @_ );
 }
 
