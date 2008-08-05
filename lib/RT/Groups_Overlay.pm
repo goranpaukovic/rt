@@ -498,27 +498,10 @@ sub LimitToDeleted {
 }
 # }}}
 
-# {{{ sub Next
-
-sub Next {
-    my $self = shift;
-
-    # Don't show groups which the user isn't allowed to see.
-
-    my $Group = $self->SUPER::Next();
-    if ((defined($Group)) and (ref($Group))) {
-	unless ($Group->CurrentUserHasRight('SeeGroup')) {
-	    return $self->Next();
-	}
-	
-	return $Group;
-    }
-    else {
-	return undef;
-    }
+sub FilterRecord {
+    return 1 unless $_[1]->CurrentUserHasRight('SeeGroup');
+    return 0;
 }
-
-
 
 sub _DoSearch {
     my $self = shift;

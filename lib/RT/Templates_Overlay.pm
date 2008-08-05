@@ -164,39 +164,29 @@ sub NewItem  {
 }
 # }}}
 
-# {{{ sub Next 
+# {{{ sub FilterRecord
 
-=head2 Next
+=head2 FilterRecord
 
 Returns the next template that this user can see.
 
 =cut
   
-sub Next {
+sub FilterRecord {
     my $self = shift;
-    
-    
-    my $templ = $self->SUPER::Next();
-    if ((defined($templ)) and (ref($templ))) {
-        
-        # If it's part of a queue, and the user can read templates in
-        # that queue, or the user can globally read templates, show it
-        if ($templ->Queue && $templ->CurrentUserHasQueueRight('ShowTemplate') or
-            $templ->CurrentUser->HasRight(Object => $RT::System, Right => 'ShowTemplate')) {
-	    return($templ);
-	}
-	
-	#If the user doesn't have the right to show this template
-	else {	
-	    return($self->Next());
-	}
+    my $tmpl = shift;
+
+    if ( $tmpl->__Value('Queue') ) {
+        return 1 unless $tmpl->CurrentUserHasQueueRight('ShowTemplate');
+    } else {
+        return 1 if $tmpl->CurrentUser->HasRight(
+            Object => $RT::System,
+            Right => 'ShowTemplate',
+        );
     }
-    #if there never was any template
-    else {
-	return(undef);
-    }	
-    
+    return 0;
 }
+
 # }}}
 
 1;

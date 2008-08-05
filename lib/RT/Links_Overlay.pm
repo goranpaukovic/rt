@@ -150,22 +150,20 @@ sub LimitReferredToBy {
 # }}}
 
 
-# {{{ Next
-sub Next {
+# {{{ FilterRecord
+sub FilterRecord {
     my $self = shift;
+    my $link = shift;
  	
-    my $Link = $self->SUPER::Next();
-    return $Link unless $Link && ref $Link;
-
     # Skip links to local objects thast are deleted
-    if ( $Link->TargetURI->IsLocal and UNIVERSAL::isa($Link->TargetObj,"RT::Ticket")
-             and $Link->TargetObj->__Value('status') eq "deleted") {
-        return $self->Next;
-    } elsif ($Link->BaseURI->IsLocal   and UNIVERSAL::isa($Link->BaseObj,"RT::Ticket")
-             and $Link->BaseObj->__Value('status') eq "deleted") {
-        return $self->Next;
+    if ( $link->TargetURI->IsLocal and UNIVERSAL::isa($link->TargetObj,"RT::Ticket")
+             and $link->TargetObj->__Value('status') eq "deleted") {
+        return 1;
+    } elsif ($link->BaseURI->IsLocal and UNIVERSAL::isa($link->BaseObj,"RT::Ticket")
+             and $link->BaseObj->__Value('status') eq "deleted") {
+        return 1;
     } else {
-        return $Link;
+        return 0;
     }
 }
 

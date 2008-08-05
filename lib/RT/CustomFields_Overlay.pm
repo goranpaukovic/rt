@@ -175,37 +175,16 @@ sub _DoSearch {
 
 # }}}
 
-# {{{ sub Next 
+=head2 FilterRecord
 
-=head2 Next
-
-Returns the next custom field that this user can see.
+Filters out custom fields this user can not see.
 
 =cut
   
-sub Next {
-    my $self = shift;
-    
-    
-    my $CF = $self->SUPER::Next();
-    if ((defined($CF)) and (ref($CF))) {
-
-	if ($CF->CurrentUserHasRight('SeeCustomField')) {
-	    return($CF);
-	}
-	
-	#If the user doesn't have the right to show this queue
-	else {	
-	    return($self->Next());
-	}
-    }
-    #if there never was any queue
-    else {
-	return(undef);
-    }	
-    
+sub FilterRecord {
+    return 1 unless $_[1]->CurrentUserHasRight('SeeCustomField');
+    return 0;
 }
-# }}}
 
 sub LimitToLookupType  {
     my $self = shift;

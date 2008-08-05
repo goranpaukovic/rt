@@ -280,32 +280,20 @@ sub DelegatedFrom {
 # }}}
 
 
-# {{{ sub Next 
-sub Next {
+# {{{ sub FilterRecord
+sub FilterRecord {
     my $self = shift;
+    my $ACE = shift;
 
-    my $ACE = $self->SUPER::Next();
-    if ( ( defined($ACE) ) and ( ref($ACE) ) ) {
-
-        if ( $self->CurrentUser->HasRight( Right  => 'ShowACL',
-                                           Object => $ACE->Object )
-             or $self->CurrentUser->HasRight( Right  => 'ModifyACL',
-                                              Object => $ACE->Object )
-          ) {
-            return ($ACE);
-        }
-
-        #If the user doesn't have the right to show this ACE
-        else {
-            return ( $self->Next() );
-        }
-    }
-
-    #if there never was any ACE
-    else {
-        return (undef);
-    }
-
+    return 0 if $ACE->CurrentUser->HasRight(
+        Right  => 'ShowACL',
+        Object => $ACE->Object,
+    );
+    return 0 if $ACE->CurrentUser->HasRight(
+        Right  => 'ModifyACL',
+        Object => $ACE->Object,
+    );
+    return 1;
 }
 
 # }}}

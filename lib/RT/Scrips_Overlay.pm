@@ -124,36 +124,19 @@ sub NewItem  {
 }
 # }}}
 
-# {{{ sub Next 
+# {{{ sub FilterRecord
 
-=head2 Next
+=head2 FilterRecord
 
-Returns the next scrip that this user can see.
+Filters out scrips this user can not see. See also L<RT::SearchBuilder/FilterRecord>.
 
 =cut
   
-sub Next {
-    my $self = shift;
-    
-    
-    my $Scrip = $self->SUPER::Next();
-    if ((defined($Scrip)) and (ref($Scrip))) {
-
-	if ($Scrip->CurrentUserHasRight('ShowScrips')) {
-	    return($Scrip);
-	}
-	
-	#If the user doesn't have the right to show this scrip
-	else {	
-	    return($self->Next());
-	}
-    }
-    #if there never was any scrip
-    else {
-	return(undef);
-    }	
-    
+sub FilterRecord {
+    return 1 unless $_[1]->CurrentUserHasRight('ShowScrips');
+    return 0;
 }
+
 # }}}
 
 =head2 Apply
