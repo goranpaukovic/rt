@@ -337,6 +337,39 @@ sub ItemsOrderBy {
 
 # }}}
 
+=head2 Next
+
+Returns next record in the collection, but only if it's not filtered
+by L</FilterRecord> method.
+
+See also L<DBIx::SearchBuilder/Next>.
+
+=cut
+
+sub Next {
+    my $self = shift;
+
+    my $record = $self->SUPER::Next( @_ );
+    # if there never was any record
+    return $record unless $record;
+    # filtered out
+    return $self->Next( @_ ) if $self->FilterRecord( $record );
+    # fine
+    return $record;
+}
+
+=head2 FilterRecord
+
+Method for subclassing, returns true if record should skipped
+from results otherwise boolean value. Record is passed as only
+value.
+
+Called from L</Next> method and other.
+
+=cut
+
+sub FilterRecord { return 0 }
+
 # {{{ sub ItemsArrayRef
 
 =head2 ItemsArrayRef
