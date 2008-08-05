@@ -2739,6 +2739,22 @@ sub ItemsArrayRef {
 
 # }}}
 
+sub FilterRecord {
+    my $self = shift;
+    my $ticket = shift;
+
+    return 1 if !$self->{'allow_deleted_search'}
+                && $ticket->__Value('Status') eq 'deleted';
+
+    # Since Ticket could be granted with more rights instead
+    # of being revoked, it's ok if queue rights allow
+    # ShowTicket.  It seems need another query, but we have
+    # rights cache in Principal::HasRight.
+    return 1 unless $ticket->CurrentUserHasRight('ShowTicket');
+
+    return 0;
+}
+
 # {{{ sub Next
 sub Next {
     my $self = shift;
