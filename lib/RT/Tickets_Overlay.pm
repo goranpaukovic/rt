@@ -2765,6 +2765,108 @@ sub Next {
 
 # }}}
 
+our %PAGE_CACHE = (
+
+);
+
+sub _DoSearch {
+    my $self = shift;
+
+    my $page_size = $self->RowsPerPage;
+    return $self->SUPER::_DoSearch( @_ ) unless $page_size;
+
+    my $key = $self->CurrentUser->id .'-'. $page_size;
+    {
+        local $self->{'first_row'} = 0;
+        local $self->{'show_rows'} = 0;
+        $key .= '-'. $self->BuildSelectQuery;
+    }
+
+    my $page = int($self->FirstRow / $page_size);
+
+    my $map = ($PAGE_CACHE{$key}||=[]);
+    if ( $page == 0 || !$map->[$page] ) {
+        return $self->_FillPage($page, $map);
+    }
+    unless ( $map->[$page][1] ) {
+        $self->{'must_redo_search'} = 0;
+        $self->{'items'} = [];
+        return 0;
+    }
+    local $self->{'first_row'} = $map->[$page][0];
+    local $self->{'show_rows'} = $map->[$page][1];
+    return $self->SUPER::_DoSearch( @_ );
+}
+
+sub _FillPage {
+    my $self = shift;
+    my $page = shift;
+    my $map = shift;
+
+    my ($current_page, $offset) = (0, 0);
+    for( my $i = $page; $i > 0; $i--) {
+        next unless defined $map->[$i];
+        $current_page = $i + 1;
+        $offset = $map->[$i][0] + $map->[$i][1];
+        last;
+    }
+
+    my $base_query_string = do {
+        local $self->{'first_row'} = 0;
+        local $self->{'show_rows'} = 0;
+        $self->BuildSelectQuery;
+    };
+
+    my $page_size = $self->RowsPerPage;
+    my $must_find_rows = $page_size * ($page - $current_page + 1);
+    die "negative must_find, never should happen" if $must_find_rows <= 0;
+
+    my @res;
+    my ($current_page_offset, $current_page_left, $current_page_size) =
+        ($offset, $page_size, 0);
+
+    while ( $must_find_rows ) {
+        my $QueryString = $base_query_string;
+        $self->_Handle->ApplyLimits(\$QueryString, $must_find_rows, $offset);
+
+        my $records = $self->_Handle->SimpleQuery($QueryString);
+        last unless $records;
+
+        my $seen_at_least_one = 0;
+        while ( my $row = $records->fetchrow_hashref ) {
+            $seen_at_least_one = 1; $current_page_size++; $offset++;
+            my $item = $self->NewItem;
+            $item->LoadFromHash( $row );
+            next if $self->FilterRecord( $item );
+
+            $must_find_rows--;
+            push @res, $item if $current_page == $page;
+
+            unless ( --$current_page_left ) {
+                if ( $map->[$current_page] && $map->[$current_page][0] != $current_page_offset ) {
+                    splice @$map, $current_page;
+                }
+                $map->[$current_page] = [ $current_page_offset, $current_page_size ];
+                $current_page++;
+                ($current_page_offset, $current_page_left, $current_page_size)
+                    = ($offset, $page_size, 0);
+            }
+        }
+        $RT::Logger->error("SQL error: ". $records->err) if $records->err;
+
+        unless ( $seen_at_least_one ) {
+            for ($current_page .. $page) {
+                $map->[$_] = [$offset, 0];
+            }
+            last;
+        }
+    }
+    $self->{'must_redo_search'} = 0;
+    $self->{'items'} = \@res;
+
+    return $self->_RecordCount;
+}
+
 # }}}
 
 # {{{ Deal with storing and restoring restrictions
