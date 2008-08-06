@@ -2731,10 +2731,13 @@ sub _OurDoCount {
     }
     $RT::Logger->error("SQL error: ". $records->err) if $records->err;
 
-    return -1 - $filtered_found
-        if $total_found == $COUNT_SAMPLE_SIZE;
+    return $filtered_found
+        if $total_found < $COUNT_SAMPLE_SIZE;
+    
+    my $all_records = $self->SUPER::CountAll;
+    return undef unless $all_records;
 
-    return $filtered_found;
+    return -1 - int(($filtered_found/$total_found) * $all_records);
 }
 
 # {{{ sub ItemsArrayRef
