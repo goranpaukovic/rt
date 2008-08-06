@@ -73,11 +73,7 @@
 
 % if ($Rows && $ShowNavigation) {
 <hr>
-% my $oddRows;
-% if (($TotalFound % $Rows) == 0) {
-% $oddRows = 0;
-% } else { $oddRows = 1; }
-% my $pages = int($TotalFound/$Rows)+$oddRows;
+% my $pages = int($TotalFound/$Rows) + (($TotalFound % $Rows) == 0)? 0 : 1;
 % $pages = 1 if $pages < 1;
 <&|/l, $Page, $pages &>Page [_1] of [_2]</&>
 
