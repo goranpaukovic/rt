@@ -116,7 +116,7 @@ if ( !defined($Rows) ) {
     }
 }
 
-my ($title, $ticketcount);
+my ($title);
 $session{'i'}++;
 $session{'tickets'} = RT::Tickets->new($session{'CurrentUser'}) ;
 $session{'tickets'}->FromSQL($Query) if ($Query);
@@ -143,8 +143,27 @@ $session{'CurrentSearchHash'} = {
 
 
 if ( $session{'tickets'}->Query()) {
-    $ticketcount = $session{tickets}->CountAll();
-    $title = loc('Found [quant,_1,ticket]', $ticketcount);
+    my $ticketcount = $session{tickets}->CountAll;
+    unless ( defined $ticketcount ) {
+        $title = loc('Unknown number of tickets');
+    }
+    elsif ( $ticketcount >= 0 ) {
+        $title = loc('Found [quant,_1,ticket]', $ticketcount);
+    } else {
+        $ticketcount = -($ticketcount+1);
+        if ( $ticketcount/1000 > 1.0 ) {
+            $title = loc('Found thousands of tickets', $ticketcount);
+        }
+        elsif ( $ticketcount/100 > 1.0 ) {
+            $title = loc('Found hundreds of tickets', $ticketcount);
+        }
+        elsif ( $ticketcount/10 > 1.0 ) {
+            $title = loc('Found tens of tickets', $ticketcount);
+        }
+        else {
+            $title = loc('Found several tickets', $ticketcount);
+        }
+    }
 } else {
     $title = loc("Find tickets");
 }
