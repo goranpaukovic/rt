@@ -2705,7 +2705,7 @@ sub Count {
 sub CountAll { return (shift)->Count( @_ ) }
 
 
-my $COUNT_SAMPLE_SIZE = 5;
+my $COUNT_SAMPLE_SIZE = 300;
 
 sub _OurDoCount {
     my $self = shift;
