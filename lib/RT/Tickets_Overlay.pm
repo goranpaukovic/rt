@@ -2867,14 +2867,14 @@ sub _FillPage {
         my $records = $self->_Handle->SimpleQuery($QueryString);
         last unless $records;
 
-        my $seen_at_least_one = 0;
+        my ($found_total, $found_filtered) = (0, 0);
         while ( my $row = $records->fetchrow_hashref ) {
-            $seen_at_least_one = 1; $current_page_size++; $offset++;
+            $found_total++; $current_page_size++; $offset++;
             my $item = $self->NewItem;
             $item->LoadFromHash( $row );
             next if $self->FilterRecord( $item );
 
-            $must_find_rows--;
+            $found_filtered++;
             push @res, $item if $current_page == $page;
 
             unless ( --$current_page_left ) {
@@ -2889,12 +2889,16 @@ sub _FillPage {
         }
         $RT::Logger->error("SQL error: ". $records->err) if $records->err;
 
-        unless ( $seen_at_least_one ) {
+        unless ( $found_total ) {
             for ($current_page .. $page) {
                 $map->[$_] = [$offset, 0];
             }
             last;
+        } elsif ( $found_total < $must_find_rows ) {
+            $map->[$current_page+1] = [$offset, 0];
+            last;
         }
+        $must_find_rows -= $found_filtered;
     }
     $self->{'must_redo_search'} = 0;
     $self->{'items'} = \@res;
