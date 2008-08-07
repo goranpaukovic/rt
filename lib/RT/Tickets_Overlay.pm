@@ -2710,9 +2710,15 @@ my $COUNT_SAMPLE_SIZE = 5;
 sub _OurDoCount {
     my $self = shift;
 
+    my $sample_size = $COUNT_SAMPLE_SIZE;
+    if ( my $page_size = $self->RowsPerPage ) {
+        my $tmp = $self->FirstRow + $page_size;
+        $sample_size = $tmp if $tmp > $sample_size;
+    }
+
     my $query_string = do {
         local $self->{'first_row'} = 0;
-        local $self->{'show_rows'} = $COUNT_SAMPLE_SIZE;
+        local $self->{'show_rows'} = $sample_size;
         $self->BuildSelectQuery;
     };
 
@@ -2732,7 +2738,7 @@ sub _OurDoCount {
     $RT::Logger->error("SQL error: ". $records->err) if $records->err;
 
     return $filtered_found
-        if $total_found < $COUNT_SAMPLE_SIZE;
+        if $total_found < $sample_size;
     
     my $all_records = $self->SUPER::CountAll;
     return undef unless $all_records;
