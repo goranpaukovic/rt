@@ -71,11 +71,15 @@
 
 </table>
 
-% if ($Rows && $ShowNavigation) {
+% if ( $Rows && $ShowNavigation ) {
 <hr>
-% my $pages = int($TotalFound/$Rows) + (($TotalFound % $Rows) == 0)? 0 : 1;
+% if ( $TotalFound >= 0 ) {
+% my $pages = int($TotalFound/$Rows) + (($TotalFound % $Rows) == 0? 0 : 1);
 % $pages = 1 if $pages < 1;
 <&|/l, $Page, $pages &>Page [_1] of [_2]</&>
+% } else {
+<&|/l, $Page &>Page [_1] of some</&>
+% }
 
 <%perl>
 my $prev = $m->comp(
@@ -98,10 +102,10 @@ my $next = $m->comp(
 );
 </%perl>
 % if ($Page > 1) {
-<a href="<%$BaseURL%><%$prev%>"><&|/l&>Previous Page</&></a>
+<a href="<% $BaseURL %><% $prev %>"><&|/l&>Previous Page</&></a>
 % }
-% if (($Page * $Rows) < $TotalFound) {
-<a href="<%$BaseURL%><%$next%>"><&|/l&>Next Page</&></a>
+% if ( $TotalFound < 0 || ($Page * $Rows) < $TotalFound ) {
+<a href="<% $BaseURL %><% $next %>"><&|/l&>Next Page</&></a>
 % }
 % }
 <%INIT>
@@ -154,7 +158,7 @@ if ($OrderBy =~ /\|/) {
 $Collection->RowsPerPage($Rows) if ($Rows);
 $Page = 1 unless $Page > 0; # workaround problems with Page = '' or undef
 $Collection->GotoPage( $Page - 1 ); # SB uses page 0 as the first page
-my $TotalFound =  $Collection->CountAll();
+my $TotalFound =  $Collection->CountAll;
 
 </%INIT>
 <%ARGS>
