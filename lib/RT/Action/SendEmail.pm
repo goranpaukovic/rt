@@ -100,7 +100,9 @@ perl(1).
 # {{{ sub Commit
 
 sub Commit {
-    my $self = shift;
+    # DO NOT SHIFT @_ in this subroutine.  It breaks Hook::LexWrap's
+    # ability to pass @_ to a 'post' routine.
+    my $self = $_[0];
 
     my ($ret) = $self->SendMessage( $self->TemplateObj->MIMEObj );
     if ( $ret > 0 ) {
@@ -162,16 +164,24 @@ sub Prepare {
     # We should never have to set the MIME-Version header
     $self->SetHeader( 'MIME-Version', '1.0' );
 
-    # try to convert message body from utf-8 to $RT::EmailOutputEncoding
-    $self->SetHeader( 'Content-Type', 'text/plain; charset="utf-8"' );
-
     # fsck.com #5959: Since RT sends 8bit mail, we should say so.
     $self->SetHeader( 'Content-Transfer-Encoding','8bit');
 
+    # For security reasons, we only send out textual mails.
+    my @parts = $MIMEObj;
+    while (my $part = shift @parts) {
+        if ($part->is_multipart) {
+            push @parts, $part->parts;
+        }
+        else {
+            $part->head->mime_attr( "Content-Type" => 'text/plain' )
+                unless RT::I18N::IsTextualContentType($part->mime_type);
+            $part->head->mime_attr( "Content-Type.charset" => 'utf-8' );
+        }
+    }
 
-    RT::I18N::SetMIMEEntityToEncoding( $MIMEObj, $RT::EmailOutputEncoding,
-        'mime_words_ok' );
-    $self->SetHeader( 'Content-Type', 'text/plain; charset="' . $RT::EmailOutputEncoding . '"' );
+
+    RT::I18N::SetMIMEEntityToEncoding( $MIMEObj, $RT::EmailOutputEncoding, 'mime_words_ok' );
 
     # Build up a MIME::Entity that looks like the original message.
     $self->AddAttachments() if ( $MIMEObj->head->get('RT-Attach-Message') );
@@ -241,8 +251,9 @@ TODO: Break this out to a separate module
 =cut
 
 sub SendMessage {
-    my $self    = shift;
-    my $MIMEObj = shift;
+    # DO NOT SHIFT @_ in this subroutine.  It breaks Hook::LexWrap's
+    # ability to pass @_ to a 'post' routine.
+    my ( $self, $MIMEObj ) = @_;
 
     my $msgid = $MIMEObj->head->get('Message-ID');
     chomp $msgid;
@@ -395,7 +406,7 @@ sub AddAttachments {
         # Don't attach anything blank
         next unless ( $attach->ContentLength );
 
-# We want to make sure that we don't include the attachment that's being sued as the "Content" of this message"
+# We want to make sure that we don't include the attachment that's being used as the "Content" of this message.
         next
           if ( $transaction_content_obj
             && $transaction_content_obj->Id == $attach->Id
@@ -473,7 +484,12 @@ sub RecordOutgoingMailTransaction {
         ActivateScrips => 0
     );
 
-
+    if( $id ) {
+	$self->{'OutgoingMailTransaction'} = $id;
+    } else {
+        $RT::Logger->warning( "Could not record outgoing message transaction: $msg" );
+    }
+    return $id;
 }
 
 # }}}
@@ -907,10 +923,6 @@ sub SetHeaderAsEncoding {
 
     my $value = $self->TemplateObj->MIMEObj->head->get($field);
 
-    # don't bother if it's us-ascii
-
-    # See RT::I18N, 'NOTES:  Why Encode::_utf8_off before Encode::from_to'
-
     $value =  $self->MIMEEncodeString($value, $enc);
 
     $self->TemplateObj->MIMEObj->head->replace( $field, $value );
@@ -946,25 +958,36 @@ sub MIMEEncodeString {
     $max = int($max/3)*3;
 
     chomp $value;
+
+    if ( $max <= 0 ) {
+      # gives an error...
+      $RT::Logger->crit("Can't encode! Charset or encoding too big.\n");
+      return ($value);
+    }
+
     return ($value) unless $value =~ /[^\x20-\x7e]/;
 
     $value =~ s/\s*$//;
-    Encode::_utf8_off($value);
-    my $res = Encode::from_to( $value, "utf-8", $charset );
-   
-    if ($max > 0) {
-      # copy value and split in chuncks
-      my $str=$value;
-      my @chunks = unpack("a$max" x int(length($str)/$max 
-                                  + ((length($str) % $max) ? 1:0)), $str);
-      # encode an join chuncks
-      $value = join " ", 
-                     map encode_mimeword( $_, $encoding, $charset ), @chunks ;
-      return($value); 
-    } else {
-      # gives an error...
-      $RT::Logger->crit("Can't encode! Charset or encoding too big.\n");
+
+    # we need perl string to split thing char by char
+    Encode::_utf8_on($value) unless Encode::is_utf8( $value );
+
+    my ($tmp, @chunks) = ('', ());
+    while ( length $value ) {
+        my $char = substr($value, 0, 1, '');
+        my $octets = Encode::encode( $charset, $char );
+        if ( length($tmp) + length($octets) > $max ) {
+            push @chunks, $tmp;
+            $tmp = '';
+        }
+        $tmp .= $octets;
     }
+    push @chunks, $tmp if length $tmp;
+
+    # encode an join chuncks
+    $value = join "\n ",
+               map encode_mimeword( $_, $encoding, $charset ), @chunks ;
+    return($value); 
 }
 
 # }}}
