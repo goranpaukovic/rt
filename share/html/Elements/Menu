@@ -46,7 +46,6 @@
 %# 
 %# END BPS TAGGED BLOCK }}}
 <ul<% !$level ? ' id="system-menu"' : ''|n %><% $menu_class ? qq[ class="$menu_class"] : ''|n %>>
-<div<% $menu_class ? qq[ class="$menu_class"] : ''|n %>><div class="wrapper">
 <%perl>
  my $sep         = 0;
  my $postsep     = 0;
@@ -117,7 +116,6 @@ my @tabs = sort keys %$toptabs;
 %
 %     $postsep = $sep;
 % }
-</div></div>
 </ul>
 
 <%INIT>

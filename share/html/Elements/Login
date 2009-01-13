@@ -70,6 +70,7 @@ my $form_action = defined $goto             ? $goto
 <& /Elements/Header, Title => loc('Login'), Focus => 'user' &>
 
 
+<div style="clear: both;"></div>
 %# End of div#quickbar from /Elements/Header
 </div>
 

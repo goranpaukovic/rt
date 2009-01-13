@@ -56,73 +56,69 @@ body {
     background: #547CCC url(<%RT->Config->Get('WebPath')%>/NoAuth/css/web2/images/background-gradient.png) top left repeat-x ;
     font-family: arial, helvetica, sans-serif;
 
+    /* below this total width, it's impossible to display RT left page will not
+       fit and go under nav, FIXME : doesn't works for IE 6 :( */
+    min-width: 76em;
+}
+
+div#page {
+    float: left;
+    width: 87.9%;
 }
 
 div#body {
-    position: relative;
     padding: 1em;
     padding-top: 1.8em;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
-    margin-left: 10.5em;
-    margin-top: 5.2em;
+    margin-top: 1em;
+    margin-left: 1em;
     margin-right: 1em;
-    margin-bottom: 0em;
+    /* cross browser min-height */
     min-height: 10%;
+    height: auto !important;
+    height: 10%;
+    /* end */
     background: #fff;
     border-top: 2px solid #ccc;
     border-left: 2px solid #ccc;
-    z-index:1;
 
+}
 
+div#header {
+    margin-left: 1em;
+    margin-right: 1em;
 }
 
 #topactions {
- position: absolute;
  background: transparent;
- top: 3.8em; 
- right: 1em;
- width: auto;
- min-width: 42em;
  font-size: 0.9em;
- z-index: 99;
-}
-
-#topactions form * {
-    vertical-align: top;
+ float: right;
+ width: 60%;
+ margin-top: 1.1em;
+ text-align: right;
 }
 
 #topactions button, #topactions select, #topactions input{
- padding-top: 0em;
- padding-bottom: 0em;
- width: 8em;
+ padding: 0em;
+ margin: 0em;
 
 }
 
-#topactions form {
- display: block;
-
+#topactions div {
+ display: inline;
 }
 
 #topactions #CreateTicketInQueue {
- text-align: right; 
-
+ display: inline;
 }
+
 #topactions #simple-search {
-    float: right;
+ display: inline;
 }
-
-#topactions #simple-search input.button {
-    width: 5em;
-}
-#topactions #simple-search .field{
- margin-left: 1em;
- }
 
 div#footer {
- position: absolute;
- right: 0;
-  text-align: right;
+ text-align: right;
  font-size: 0.9em;
  margin-top: 2em;
  background: #fff;
@@ -133,6 +129,8 @@ div#footer {
 
 
 
+ float: right;
+ width: 40%;
 
  border-top: 2px solid #aaa;
  border-left: 2px solid #aaa;
@@ -146,7 +144,7 @@ div#footer {
 }
 
 div#footer #time {
-display: none ;
+ display: none ;
 }
 
 div#footer #bpscredits {
@@ -159,23 +157,18 @@ div#footer #bpscredits {
 /* logo stuff */
 
 div#logo {
+    float: left;
 }
 
 
 div#logo a {
      display: none;
-    position: absolute;
-    left: 0;
-    bottom: 0;
 }
 div#logo a img {
     border: 0;
 }
 div#logo .rtname {
-    position: absolute;
     font-weight: bold;
-    top: 1em;
-    left: 1em;
 }
 
 
@@ -189,30 +182,28 @@ div#quickbar a, div#logo a {
 
 div#quickbar {
  background: #eaeaea;
- padding-top: 1em;
+ padding-top: 0.5em;
  padding-left: 1em;
+ padding-right: 1em;
  padding-bottom: 0.5em;
- height: 1em;
  border-bottom: 1px solid #ccc;
 
 }
 div#quick-personal {
-    position: absolute;
-    right: 1em;
-    top: 1em;
+    float: right;
+    width: 50%;
+    text-align: right;
 }
 
 
 div#header h1 {
- position: absolute;
- left: 7.25em;
- right: 20em;
+ float: left;
  overflow: hidden;
- height: 1em;
  font-size: 1.4em;
  margin-top: 0.4em;
- padding: 0.25em;
+ padding: 0.25em 0.25em 0em 0em;
  color: #fff;
+ width: 39%;
 }
 
 /* in multi-column layouts, make sure we have an internal gutter */

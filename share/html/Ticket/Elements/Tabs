@@ -308,6 +308,34 @@ if ($has_query) {
 
 }
 
+# Tools for result view
+if ( $QueryString && ! $Ticket ) {
+my $ical_path = join '/', map $m->interp->apply_escapes($_, 'u'),
+    $session{'CurrentUser'}->UserObj->Name,
+    $session{'CurrentUser'}->UserObj->GenerateAuthString( $Query ),
+    $Query;
+
+    $actions->{'A'} = {
+        title => loc('Spreadsheet'),
+        path  => "Search/Results.tsv".$QueryString,
+    };
+    $actions->{'B'} = {
+        title => loc('RSS'),
+        path  => $RSSFeedURL,
+    };
+    $actions->{'C'} = {
+        title => loc('iCal'),
+        path  => "NoAuth/iCal/".$ical_path,
+    };
+    $actions->{'D'} = {
+        title => loc('Editable text'),
+        path  => "Tools/Offline.html".$ShortQueryString,
+    };
+    # Now let callbacks add their extra tools
+    $m->callback( Query => $Query, QueryString => $QueryString, ShortQueryString => $ShortQueryString, actions=> $actions, tabs => $tabs, %ARGS, CallbackName => 'AfterResultTools' );
+
+}
+
 foreach my $searchtab ( keys %{$searchtabs} ) {
     ( $searchtab =~ /^_/ )
         ? $tabs->{ "s" . $searchtab } = $searchtabs->{$searchtab}
@@ -324,4 +352,8 @@ $current_tab => ''
 $current_subtab => ''
 $Title => undef
 $RowsPerPage => undef
+$Query => undef
+$RSSFeedURL => undef
+$ShortQueryString => undef
+$QueryString => undef
 </%ARGS>

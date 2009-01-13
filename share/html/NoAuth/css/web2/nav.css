@@ -46,20 +46,24 @@
 %# 
 %# END BPS TAGGED BLOCK }}}
 div#nav {
- position: absolute;
- left: 0;
  font-size: 0.9em;
- top: 3.2em;
- width: 10.5em;
+ width: 12%;
  background: #fff;
  -moz-border-radius-bottomright: 0.5em;
  -webkit-border-bottom-right-radius: 0.5em;
-  border-left: 1px solid #999;  
-border-top: 1px solid #999;
+ border-left: 1px solid #999;  
+ border-top: 1px solid #999;
 
  -moz-border-radius-topright: 0.5em;
  -webkit-border-top-right-radius: 0.5em;
- z-index: 99;
+
+ /* cross browser min-height */
+ min-height: 5%;
+ height: auto !important;
+ height: 5%;
+ /* end */
+ float: left;
+ margin-top: 1em;
 
 
 }
@@ -133,46 +137,32 @@ div#nav a.selected:after {
 }
 
 div#page-navigation {
- background: white;
- position: relative;
- width:100%;
- z-index: 10;
-
+    margin-right: 0;
+    margin-left: 0;
 }
 
 
 div#page-navigation ul {
-
+ margin: 0;
+ padding: 0;
 }
 
 div#page-navigation ul#page-menu {
- display: block;
- position: absolute;
- left: 8em;
  font-size: 0.9em;
- top: 2.3em;
  min-height: 1em;
  background-color: white;
- right: 0em;
  padding-top:0.3em;
  padding-bottom:0.5em;
+ padding-left: 1em;
  border-top: 1px solid #aaa;
 
 }
 
-/* ie hack */
-* html div#page-navigation ul#page-menu {
-    left: 6.5em;
-    top: 3.2em;
-    padding-left: 2em;
-}
 
-
-div#page-navigation ul#actions-menu {
- position: absolute;
- right: 1em;
- top: 5.2em;
- margin-top: 0em;
+div#body ul#actions-menu {
+ float: right;
+ margin-top: -1.9em;
+ margin-right: -1em;
  padding: 0.25em;
  padding-left: 0.5em;
  padding-right: 0.5em;
@@ -189,6 +179,12 @@ div#page-navigation ul#actions-menu {
 
 }
 
+
+
+div#body ul#actions-menu li{
+ display: inline;
+
+}
 
 
 div#page-navigation ul li{

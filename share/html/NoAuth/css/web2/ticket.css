@@ -48,6 +48,7 @@
 div#ticket-history div.ticket-transaction {
  border-top: 1px solid #ccc;
  padding-bottom: 0.25em;
+ position: relative;
 
 }
 
@@ -65,9 +66,13 @@ div#ticket-history {
 
 }
 
+.ticket-transaction div.metadata {
+ position: relative;
+}
 .ticket-transaction div.metadata span.actions {
  position: absolute;
- right: 2.3em;
+ right: 0;
+ top: 0;
  padding: 0em;
  background: #ccc;
  text-align: right;

@@ -50,6 +50,7 @@
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 <title><%$Title%></title>
 
 
@@ -83,9 +84,9 @@
   <body<% $id && qq[ id="comp-$id"] |n %>>
 
 % if ($ShowBar) {
-<& /Elements/Logo, %ARGS &>
 
 <div id="quickbar">
+<& /Elements/Logo, %ARGS &>
   <div id="quick-personal">
     <span class="hide"><a href="#skipnav"><&|/l&>Skip Menu</&></a> | </span>
 % if ($session{'CurrentUser'}->Name) {

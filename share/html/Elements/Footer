@@ -47,7 +47,10 @@
 %# END BPS TAGGED BLOCK }}}
 %# End of div#body from /Elements/PageLayout
 </div>
+%# End of div#page from /Elements/PageLayout
+</div>
 % $m->callback( %ARGS );
+<div style="clear: both;"></div>
 <div id="footer">
 % if ($m->{'rt_base_time'}) {
   <p id="time">
