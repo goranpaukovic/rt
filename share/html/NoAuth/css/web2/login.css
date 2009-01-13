@@ -45,6 +45,13 @@
 %# those contributions and any derivatives thereof.
 %# 
 %# END BPS TAGGED BLOCK }}}
+
+div#body.login-body {
+    margin-top: 5em;
+    margin-left: 5em;
+    margin-right: 5em;
+}
+
 #login-box hr {
  display: none;
 }
