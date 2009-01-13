@@ -117,9 +117,6 @@
 
 </div>
 <div id="body">
-% $m->callback( %ARGS, CallbackName => 'BeforeBody' );
-% $m->flush_buffer(); # we've got the page laid out, let's flush the buffer;
-
 % if (($actions && %$actions) || ($subactions && %$subactions)) {
   <ul id="actions-menu">
     <div><div><div>
@@ -162,6 +159,9 @@
     </div></div></div>
   </ul>
 % }
+
+% $m->callback( %ARGS, CallbackName => 'BeforeBody' );
+% $m->flush_buffer(); # we've got the page laid out, let's flush the buffer;
 
 <%INIT>
 if ( defined $current_toptab ) {
