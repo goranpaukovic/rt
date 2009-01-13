@@ -70,3 +70,8 @@
     right: 0em;
 }
 
+/* Force some widget to fit at max parent box */
+#HomeRefreshInterval, #SavedSearchLoad, #SavedSearchOwner {
+    width: 100%;
+}
+

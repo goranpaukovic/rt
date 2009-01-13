@@ -199,6 +199,6 @@
 
 /* Force some widget to fit at max parent box */
 #HomeRefreshInterval, #SavedSearchLoad, #SavedSearchOwner {
-    width: 100%;
+    max-width: 100%;
 }
 
