@@ -45,44 +45,19 @@
 %# those contributions and any derivatives thereof.
 %# 
 %# END BPS TAGGED BLOCK }}}
-% if ( $Multiple ) {
-<textarea cols="<% $Cols %>" rows="<% $Rows %>" name="<% $name %>-Values" id="<% $name %>-Values" ><% $Default %></textarea><div id="<% $name %>-Choices" class="autocomplete"></div>
-<script type="text/javascript">
-new Ajax.Autocompleter(
-    "<% $name %>-Values",
-    "<% $name %>-Choices",
-    <% RT->Config->Get('WebPath')%>"/Helpers/Autocomplete/CustomFieldValues",
-    { tokens: [ '\n' ] }
-);
-% } else {
-<input type="text" id="<% $name %>-Value" name="<% $name %>-Value" value="<% $Default %>"/><div id="<% $name %>-Choices" class="autocomplete"></div>
-<script type="text/javascript">
-new Ajax.Autocompleter(
-    "<% $name %>-Value",
-    "<% $name %>-Choices",
-    <% RT->Config->Get('WebPath')%>"/Helpers/Autocomplete/CustomFieldValues",
-    {}
-);
+<ul>
+% while (my $link = $member_of->Next) {
+<li><& /Elements/ShowLink, URI => $link->TargetURI &><br />
 % }
-</script>
+</ul>
 <%INIT>
-my $name = $NamePrefix . $CustomField->Id;
-if ( $Default && !$Multiple ) {
-    $Default =~ s/\s*\r*\n\s*/ /g;
-}
-if ( $Multiple and $Values ) {
-    $Default = '';
-    while (my $value = $Values->Next ) {
-        $Default .= $value->Content ."\n";
-    }
-}
+
+return unless $Ticket;
+my $member_of = $Ticket->MemberOf;
+return unless $member_of->Count;
+
 </%INIT>
+
 <%ARGS>
-$CustomField => undef
-$NamePrefix  => undef
-$Default     => undef
-$Values      => undef
-$Multiple    => undef
-$Rows        => undef
-$Cols        => undef
+$Ticket => undef
 </%ARGS>

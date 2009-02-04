@@ -110,7 +110,7 @@ can be set for each config optin:
  Overridable - Can users change this option
  SortOrder   - Within a Section, how should the options be sorted
                for display to the user
- Widget      - Mason component path to widget that should be user 
+ Widget      - Mason component path to widget that should be used 
                to display this config option
  WidgetArguments - An argument hash passed to the WIdget
     Description - Friendly description to show the user
@@ -275,7 +275,7 @@ our %META = (
             Callback => sub { my $ret = { Values => [], ValuesLabel => {}};
                               my $date = new RT::Date($HTML::Mason::Commands::session{'CurrentUser'});
                               $date->Set;
-                              foreach my $value (qw(DefaultFormat RFC2822 ISO W3CDTF)) { #loc_qw
+                              foreach my $value ($date->Formatters) {
                                  push @{$ret->{Values}}, $value;
                                  $ret->{ValuesLabel}{$value} = $date->$value();
                               }
@@ -447,8 +447,13 @@ sub _LoadConfig {
     my $self = shift;
     my %args = ( File => '', @_ );
 
-    my $is_ext = $args{'File'} !~ /^RT_(?:Site)?Config/ ? 1 : 0;
-    my $is_site = $args{'File'} =~ /SiteConfig/ ? 1 : 0;
+    my ($is_ext, $is_site);
+    if ( $args{'File'} eq ($ENV{RT_SITE_CONFIG}||'') ) {
+        ($is_ext, $is_site) = ('', 1);
+    } else {
+        $is_ext = $args{'File'} =~ /^(?!RT_)(?:(.*)_)(?:Site)?Config/ ? $1 : '';
+        $is_site = $args{'File'} =~ /SiteConfig/ ? 1 : 0;
+    }
 
     eval {
         package RT;
@@ -555,10 +560,12 @@ sub Configs {
 
 Takes name of the option as argument and returns its current value.
 
-In the case of a user-overridable option, first checks the user's preferences before looking for site-wide configuration.
+In the case of a user-overridable option, first checks the user's
+preferences before looking for site-wide configuration.
 
-Returns values from RT_SiteConfig, RT_Config and then the %META hash of configuration variables's "Default" for this config variable, in that order.
-
+Returns values from RT_SiteConfig, RT_Config and then the %META hash
+of configuration variables's "Default" for this config variable,
+in that order.
 
 Returns different things in scalar and array contexts. For scalar
 options it's not that important, however for arrays and hash it's.
@@ -614,7 +621,7 @@ sub Set {
         { no warnings 'once'; no strict 'refs'; @{"RT::$name"} = (@_); }
     } elsif ( $type eq 'HASH' ) {
         $OPTIONS{$name} = {@_};
-        { no warnings 'once';  no strict 'refs'; %{"RT::$name"} = (@_); }
+        { no warnings 'once'; no strict 'refs'; %{"RT::$name"} = (@_); }
     } else {
         $OPTIONS{$name} = shift;
         {no warnings 'once'; no strict 'refs'; ${"RT::$name"} = $OPTIONS{$name}; }
@@ -664,7 +671,41 @@ sub SetFromConfig {
         $type = $META{$name}->{'Type'} || 'SCALAR';
     }
 
-    return 1 if exists $OPTIONS{$name} && !$args{'SiteConfig'};
+    # if option is already set we have to check where
+    # it comes from and may be ignore it
+    if ( exists $OPTIONS{$name} ) {
+        if ( $args{'SiteConfig'} && $args{'Extension'} ) {
+            # if it's site config of an extension then it can only
+            # override options that came from its main config
+            if ( $args{'Extension'} ne $META{$name}->{'Source'}{'Extension'} ) {
+                my %source = %{ $META{$name}->{'Source'} };
+                warn
+                    "Change of config option '$name' at $args{'File'} line $args{'Line'} has been ignored."
+                    ." This option earlier has been set in $source{'File'} line $source{'Line'}."
+                    ." To overide this option use ". ($source{'Extension'}||'RT')
+                    ." site config."
+                ;
+                return 1;
+            }
+        } elsif ( !$args{'SiteConfig'} && $META{$name}->{'Source'}{'SiteConfig'} ) {
+            # if it's core config then we can override any option that came from another
+            # core config, but not site config
+
+            my %source = %{ $META{$name}->{'Source'} };
+            if ( $source{'Extension'} ne $args{'Extension'} ) {
+                # as a site config is loaded earlier then its base config
+                # then we warn only on different extensions, for example
+                # RTIR's options is set in main site config or RTFM's
+                warn
+                    "Change of config option '$name' at $args{'File'} line $args{'Line'} has been ignored."
+                    ." It's may be ok, but we want you to be aware."
+                    ." This option earlier has been set in $source{'File'} line $source{'Line'}."
+                ;
+            }
+
+            return 1;
+        }
+    }
 
     $META{$name}->{'Type'} = $type;
     foreach (qw(Package File Line SiteConfig Extension)) {
@@ -757,31 +798,28 @@ sub Sections {
 
 sub Options {
     my $self = shift;
-    my %args = ( Section => undef, Overridable => 1, @_ );
-    my @res  = sort { ($META{$a}->{SortOrder}||9999) <=> ($META{$b}->{SortOrder}||9999)
-                       || $a cmp $b } keys %META;
+    my %args = ( Section => undef, Overridable => 1, Sorted => 1, @_ );
+    my @res  = keys %META;
+    
     @res = grep( ( $META{$_}->{'Section'} || 'General' ) eq $args{'Section'},
-        @res )
-        if defined $args{'Section'};
+        @res 
+    ) if defined $args{'Section'};
+
     if ( defined $args{'Overridable'} ) {
         @res
             = grep( ( $META{$_}->{'Overridable'} || 0 ) == $args{'Overridable'},
             @res );
     }
+
+    if ( $args{'Sorted'} ) {
+        @res = sort {
+            ($META{$a}->{SortOrder}||9999) <=> ($META{$b}->{SortOrder}||9999)
+            || $a cmp $b 
+        } @res;
+    } else {
+        @res = sort { $a cmp $b } @res;
+    }
     return @res;
 }
-
-=head3 Type
-
-=cut
-
-sub Type {
-    my $self = shift;
-    my $name = shift;
-}
-
-=head3 IsOverridable
-
-=cut
 
 1;

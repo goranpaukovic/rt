@@ -600,12 +600,21 @@ signatures instead of 'RFC' (GPG/MIME: RFC3156 and RFC1847) format.
 If you want to allow people to encrypt attachments inside the DB then
 set C<AllowEncryptDataInDB> to true
 
+Set C<RejectOnMissingPrivateKey> to false if you don't want to reject
+emails encrypted for key RT doesn't have and can not decrypt.
+
+Set C<RejectOnBadData> to false if you don't want to reject letters
+with incorrect GnuPG data.
+
 =cut
 
 Set( %GnuPG,
     Enable => @RT_GPG@,
     OutgoingMessagesFormat => 'RFC', # Inline
     AllowEncryptDataInDB   => 0,
+
+    RejectOnMissingPrivateKey => 1,
+    RejectOnBadData           => 1,
 );
 
 =item C<%GnuPGOptions>
@@ -682,6 +691,11 @@ Set($LogToFileNamed , "rt.log");    #log to rt.log
 If set to a log level then logging will include stack
 traces for messages with level equal to or greater than
 specified.
+
+NOTICE: Stack traces include parameters that functions or methods
+were called wiht. It is possible for stack trace logging to reveal
+sensitive information such as passwords or ticket content in your
+logs.
 
 =cut
 
@@ -930,7 +944,7 @@ Set($WebExternalAuth, undef);
 
 =item C<$WebFallbackToInternalAuth>
 
-If C<$WebFallbackToInternalAuth> is undefined, the user is allowed a chance
+If C<$WebFallbackToInternalAuth> is defined, the user is allowed a chance
 of fallback to the login screen, even if REMOTE_USER failed.
 
 =cut
@@ -1284,6 +1298,7 @@ section in perldoc F<lib/RT/Date.pm> for more options.  This option can
 be overridden by users in their preferences.
 Some examples:
 
+C<Set($DateTimeFormat, 'LocalizedDateTime');>
 C<Set($DateTimeFormat, { Format => 'ISO', Seconds => 0 });>
 C<Set($DateTimeFormat, 'RFC2822');>
 C<Set($DateTimeFormat, { Format => 'RFC2822', Seconds => 0, DayOfWeek => 0 });>
