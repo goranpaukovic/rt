@@ -94,8 +94,9 @@ div#header {
  background: transparent;
  font-size: 0.9em;
  float: right;
- width: 60%;
+ width: auto;
  margin-top: 1.1em;
+ margin-left: 1em;
  text-align: right;
 }
 
@@ -111,6 +112,10 @@ div#header {
 
 #topactions #CreateTicketInQueue {
  display: inline;
+}
+
+#topactions #CreateTicketInQueue select.select-queue {
+    max-width: 12em;
 }
 
 #topactions #simple-search {
@@ -197,13 +202,10 @@ div#quick-personal {
 
 
 div#header h1 {
- float: left;
- overflow: hidden;
  font-size: 1.4em;
  margin-top: 0.4em;
  padding: 0.25em 0.25em 0em 0em;
  color: #fff;
- width: 39%;
 }
 
 /* in multi-column layouts, make sure we have an internal gutter */

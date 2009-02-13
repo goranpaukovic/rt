@@ -60,12 +60,12 @@
 <div id="page">
 
 <div id="header">
-<h1><% $title %></h1>
 <div id="topactions">
 % foreach my $action (reverse sort keys %{$topactions}) {
 <div class="topaction" id="topaction-<%$action%>"><% $topactions->{"$action"}->{'html'} |n %></div>
 % }
 </div>
+<h1><% $title %></h1>
 <div style="clear: both;"></div>
 </div>
 <div id="page-navigation">
