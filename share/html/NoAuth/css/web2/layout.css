@@ -66,7 +66,7 @@ div#body {
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
     margin-left: 10.5em;
-    margin-top: 5.2em;
+    margin-top: 0.3em;
     margin-right: 1em;
     margin-bottom: 0em;
     min-height: 10%;
@@ -83,10 +83,9 @@ div#body {
  background: transparent;
  top: 3.8em; 
  right: 1em;
- width: auto;
- min-width: 42em;
+ width: 34em;
  font-size: 0.9em;
- z-index: 99;
+ z-index: 15;
 }
 
 #topactions form * {
@@ -123,8 +122,7 @@ div#body {
  }
 
 div#footer {
- position: absolute;
- right: 0;
+ float: right;
   text-align: right;
  font-size: 0.9em;
  margin-top: 2em;
@@ -179,6 +177,7 @@ div#logo .rtname {
     font-weight: bold;
     top: 1em;
     left: 1em;
+    z-index: 99;
 }
 
 
@@ -197,6 +196,7 @@ div#quickbar {
  padding-bottom: 0.5em;
  height: 1em;
  border-bottom: 1px solid #ccc;
+ position: relative;
 
 }
 div#quick-personal {
@@ -204,15 +204,16 @@ div#quick-personal {
     margin-right: 1em;
 }
 
+div#header {
+    margin-left: 9.5em;
+}
 
 div#header h1 {
- position: absolute;
- left: 7.25em;
- right: 20em;
- overflow: hidden;
- height: 1em;
+ margin-left: 0.5em;
+ margin-right: 19em;
  font-size: 1.4em;
- margin-top: 0.4em;
+ margin-top: 0.2em;
+ margin-bottom: 0.2em;
  padding: 0.25em;
  color: #fff;
 }

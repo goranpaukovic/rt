@@ -45,12 +45,28 @@
 %# those contributions and any derivatives thereof.
 %# 
 %# END BPS TAGGED BLOCK }}}
+
+div#body {
+    height: 100%;
+    padding-top: 3em;
+}
+
+div#topactions {
+    left: 50em;
+    margin-left: 0em;
+    margin-right: 0em;
+}
+
 .topaction .select-queue {
     margin-top: 0;
 }
 
-div#page-navigation ul#page-menu {
-    margin-top: -3.2em;
+.quick-create textarea {
+    width: 100%;
+} 
+
+div#page-navigation ul#actions-menu {
+    right: 10.5em;
 }
 
 .titlebox-title .widget {
