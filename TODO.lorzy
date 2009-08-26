@@ -134,3 +134,37 @@ rules and language features we need
 
 
 accessors "for everything"
+------------------------
+
+
+if ( ... )
+
+  Str -> .... ->  Bool
+
+if ( ... ticket:subject [isdefined,not,...] .... )
+
+if ( ticket:subject matches [....] ) <- "enter something here"
+
+if ( ticket:subject matches "foo" ) <- ....
+
+
+
+-----
+
+Bool -> ... -> Bool 
+[Bool] -> Bool
+
+if ( ticket:subject matches "foo" ) <- ....
+
+if ( (and (ticket:subject matches "foo" .... (+ -)
+                                                        )
+
+
+
+-=-----
+
+Str -> .... -> Bool
+
+if ( ticket:subject )
+
+
